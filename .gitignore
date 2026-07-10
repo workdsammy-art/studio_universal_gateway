@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
+
+# Dashboard
+dashboard/node_modules/
+dashboard/.vscode/
+dashboard/*.local

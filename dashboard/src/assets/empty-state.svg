@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" fill="transparent"/>
+  <circle cx="200" cy="140" r="60" stroke="#5A5A5A" stroke-width="1" stroke-dasharray="4 4" opacity="0.3"/>
+  <path d="M180 110V170H220V110H180ZM185 115H215V165H185V115Z" fill="#5A5A5A" opacity="0.5"/>
+  <rect x="195" y="125" width="10" height="10" fill="none" stroke="#5A5A5A" stroke-width="1" opacity="0.4"/>
+  <text x="200" y="210" font-family="system-ui, sans-serif" font-size="13" fill="#5A5A5A" text-anchor="middle" opacity="0.6">Connect Input/Output Gateway nodes to your workflow</text>
+</svg>
