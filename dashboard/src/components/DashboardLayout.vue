@@ -31,8 +31,8 @@ const hasRight = computed(() => byPosition.value.right.inputs.length > 0 || byPo
 </script>
 
 <template>
-  <div class="flex flex-1 min-h-0">
-    <aside v-if="hasLeft" class="overflow-y-auto px-[16px] py-[12px] gap-[16px] border-r flex flex-col" style="width: 20%; min-width: 240px; background: var(--surface-ground);">
+  <div class="layout-grid flex-1 min-h-0">
+    <aside v-if="hasLeft" class="col-left overflow-y-auto px-4 py-3 gap-4 flex flex-col" style="background: var(--surface-ground);">
       <ColumnPanel
         position="left"
         :input-widgets="byPosition.left.inputs"
@@ -40,7 +40,7 @@ const hasRight = computed(() => byPosition.value.right.inputs.length > 0 || byPo
       />
     </aside>
 
-    <section v-if="hasMiddle" class="flex-1 overflow-y-auto px-[16px] py-[12px] gap-[16px] flex flex-col" style="background: var(--surface-section);">
+    <section v-if="hasMiddle" class="col-center overflow-y-auto px-4 py-3 gap-4 flex flex-col" style="background: var(--surface-section);">
       <ColumnPanel
         position="middle"
         :input-widgets="byPosition.middle.inputs"
@@ -48,14 +48,29 @@ const hasRight = computed(() => byPosition.value.right.inputs.length > 0 || byPo
       />
     </section>
 
-    <aside v-if="hasRight" class="overflow-y-auto px-[16px] py-[12px] gap-[16px] border-l flex flex-col" style="width: 20%; min-width: 240px; background: var(--surface-ground);">
+    <aside v-if="hasRight" class="col-right overflow-y-auto px-4 py-3 gap-4 flex flex-col" style="background: var(--surface-ground);">
       <ColumnPanel
         position="right"
         :input-widgets="byPosition.right.inputs"
         :output-widgets="byPosition.right.outputs"
       />
-
       <PastGenerations :generations="pastGenerations" @clear="emit('clear')" />
     </aside>
   </div>
 </template>
+
+<style scoped>
+.layout-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr 240px;
+}
+.col-left { border-right: 1px solid var(--surface-border); }
+.col-right { border-left: 1px solid var(--surface-border); }
+@media (max-width: 1200px) {
+  .layout-grid { grid-template-columns: 200px 1fr 200px; }
+}
+@media (max-width: 900px) {
+  .layout-grid { grid-template-columns: 1fr; }
+  .col-left, .col-right { display: none; }
+}
+</style>

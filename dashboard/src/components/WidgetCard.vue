@@ -54,9 +54,9 @@ function onUpdate(val: any) {
 
 <template>
   <div class="card">
-    <div class="p-[12px]">
+    <div class="p-3">
       <div class="flex items-center justify-between">
-        <label class="block font-mono text-[11px] font-bold uppercase tracking-widest truncate" :title="widget.name" style="color: var(--text-secondary);">
+        <label class="block font-mono text-xs font-bold uppercase tracking-widest truncate" :title="widget.name" style="color: var(--text-secondary);">
           {{ widget.name }}
         </label>
         <div v-if="isInput" class="flex items-center gap-1">
@@ -71,13 +71,13 @@ function onUpdate(val: any) {
           </select>
           <span
             v-else
-            class="font-mono text-[10px] px-[4px] rounded"
+            class="font-mono text-2xs px-1 rounded"
             :title="'control: fixed'"
             style="color: var(--accent-color); background: color-mix(in srgb, var(--accent-color) 12%, transparent); line-height: 1.4;"
           >fx</span>
         </div>
       </div>
-      <div class="mt-[8px]">
+      <div class="mt-2">
         <component
           :is="comp"
           :widget="widget"
@@ -86,7 +86,7 @@ function onUpdate(val: any) {
           @update:model-value="onUpdate"
         />
       </div>
-      <span v-if="!isInput && widget.data === undefined" class="block mt-[4px] font-mono text-xs italic" style="color: var(--text-secondary); opacity: 0.4;">waiting for data...</span>
+      <span v-if="!isInput && widget.data === undefined" class="block mt-1 font-mono text-sm italic" style="color: var(--text-secondary); opacity: 0.4;">waiting for data...</span>
     </div>
   </div>
 </template>

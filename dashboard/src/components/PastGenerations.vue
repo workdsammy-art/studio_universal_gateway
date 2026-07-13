@@ -18,9 +18,9 @@ function closeLightbox() {
 <template>
   <div v-if="generations.length > 0">
     <div class="flex items-center justify-between mb-3">
-      <div class="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-widest" style="color: var(--text-secondary);">
+      <div class="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest" style="color: var(--text-secondary);">
         <span>Past Generations</span>
-        <span class="text-[10px]" style="opacity: 0.4;">({{ generations.length }})</span>
+        <span class="text-2xs" style="opacity: 0.4;">({{ generations.length }})</span>
       </div>
       <button class="btn btn-outline btn-icon btn-sm" @click="emit('clear')">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>

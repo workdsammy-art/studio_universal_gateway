@@ -49,7 +49,6 @@ export function useWebSocket(callbacks?: { onExecuted?: (assets: any[], outputWi
   }
 
   function flushImages() {
-    console.log('[gateway] flushImages called. pendingStudioAssets=', !!pendingStudioAssets, 'pendingImages=', pendingImages.length, 'output_widgets=', (state.data?.output_widgets || []).length)
     if (!pendingStudioAssets || !state.data?.output_widgets) return
     const widgets = state.data.output_widgets
     let imgIdx = 0
@@ -87,9 +86,7 @@ export function useWebSocket(callbacks?: { onExecuted?: (assets: any[], outputWi
         break
 
       case 'executed':
-        console.log('[gateway] executed msg received. node=', msg.data?.node, 'outputKeys=', Object.keys(msg.data?.output || {}))
         if (msg.data?.output?.images) {
-          console.log('[gateway] collected images:', JSON.stringify(msg.data.output.images))
           for (const img of msg.data.output.images) {
             pendingImages.push(normalizeMedia(img))
           }
@@ -102,25 +99,16 @@ export function useWebSocket(callbacks?: { onExecuted?: (assets: any[], outputWi
         }
         if (msg.data?.output?.studio_assets) {
           const assets = msg.data.output.studio_assets
-          console.log('[gateway] studio_assets found:', JSON.stringify(assets))
-          console.log('[gateway] output_widgets names:', JSON.stringify((state.data?.output_widgets || []).map((w: any) => w.name)))
           if (state.data?.output_widgets) {
             const widgets = state.data.output_widgets
             for (const asset of assets) {
               if (asset.data !== undefined && asset.data !== null) {
                 const w = widgets.find((w: any) => w.name === asset.name)
                 if (w) {
-                  console.log('[gateway] set data for', asset.name, '->', asset.data)
                   w.data = asset.data
-                } else {
-                  console.log('[gateway] NO WIDGET MATCH for', asset.name)
                 }
-              } else {
-                console.log('[gateway] asset', asset.name, 'has empty data (waiting for image flush)')
               }
             }
-          } else {
-            console.log('[gateway] output_widgets is null/undefined!')
           }
           pendingStudioAssets = assets
         }

@@ -9,22 +9,22 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex flex-col gap-[16px]">
+  <div class="flex flex-col gap-4">
     <div v-if="inputWidgets.length > 0">
-      <div class="flex items-center gap-2 mb-[8px] font-mono text-[11px] font-bold uppercase tracking-widest" style="color: var(--text-secondary);">
+      <div class="flex items-center gap-2 mb-2 font-mono text-xs font-bold uppercase tracking-widest" style="color: var(--text-secondary);">
         <span>INPUTS</span>
-        <span class="text-[10px]" style="opacity: 0.4;">({{ inputWidgets.length }})</span>
+        <span class="text-2xs" style="opacity: 0.4;">({{ inputWidgets.length }})</span>
       </div>
-      <div class="flex flex-wrap gap-[8px]">
+      <div class="flex flex-wrap gap-2">
         <WidgetCard v-for="w in inputWidgets" :key="'in-' + w.name" :widget="w" :is-input="true" />
       </div>
     </div>
     <div v-if="outputWidgets.length > 0">
-      <div class="flex items-center gap-2 mb-[8px] font-mono text-[11px] font-bold uppercase tracking-widest" style="color: var(--text-secondary);">
+      <div class="flex items-center gap-2 mb-2 font-mono text-xs font-bold uppercase tracking-widest" style="color: var(--text-secondary);">
         <span>OUTPUTS</span>
-        <span class="text-[10px]" style="opacity: 0.4;">({{ outputWidgets.length }})</span>
+        <span class="text-2xs" style="opacity: 0.4;">({{ outputWidgets.length }})</span>
       </div>
-      <div class="flex flex-wrap gap-[8px]">
+      <div class="flex flex-wrap gap-2">
         <WidgetCard v-for="w in outputWidgets" :key="'out-' + w.name" :widget="w" :is-input="false" />
       </div>
     </div>

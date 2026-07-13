@@ -339,11 +339,19 @@ onUnmounted(() => {
         :past-generations="pastGenerations"
         @clear="clearPastGenerations"
       />
-      <div v-else class="flex-1 flex items-center justify-center flex-col gap-4">
-        <img v-if="!state.loaded" :src="emptyState" alt="Loading..." style="width: 256px; height: 192px;" />
-        <span v-if="!state.loaded" class="font-mono text-xs" style="color: var(--text-secondary); opacity: 0.6;">Loading dashboard...</span>
-        <img v-if="state.loaded && !state.data" :src="emptyState" alt="No data" style="width: 256px; height: 192px;" />
-        <span v-if="state.loaded && !state.data" class="font-mono text-xs" style="color: var(--text-secondary); opacity: 0.6;">Connect Input/Output Gateway nodes to your workflow</span>
+      <div v-else class="flex-1 flex items-center justify-center">
+        <div v-if="!state.loaded" class="flex flex-col gap-3" style="width: 400px;">
+          <div class="skeleton" style="height: 20px; width: 60%;"></div>
+          <div class="skeleton" style="height: 80px;"></div>
+          <div class="skeleton" style="height: 20px; width: 40%;"></div>
+          <div class="skeleton" style="height: 80px;"></div>
+          <div class="skeleton" style="height: 20px; width: 50%;"></div>
+          <div class="skeleton" style="height: 80px;"></div>
+        </div>
+        <div v-if="state.loaded && !state.data" class="flex items-center justify-center flex-col gap-4">
+          <img :src="emptyState" alt="No data" style="width: 256px; height: 192px;" />
+          <span class="font-mono text-sm" style="color: var(--text-secondary); opacity: 0.6;">Connect Input/Output Gateway nodes to your workflow</span>
+        </div>
       </div>
     </main>
   </div>
