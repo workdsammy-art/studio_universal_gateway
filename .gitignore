@@ -10,6 +10,7 @@ __pycache__/
 dashboard/node_modules/
 dashboard/.vscode/
 dashboard/*.local
+dashboard/audit/
 
 # Graphify
 graphify-out/
