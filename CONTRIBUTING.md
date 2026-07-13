@@ -64,3 +64,13 @@ git checkout dev              # switch back to dev for next changes
 ## Golden Rule
 
 **Never commit directly to `main`.** Always work on `dev`, then merge.
+
+---
+
+## Session Log
+
+| Date | Action | Details |
+|------|--------|---------|
+| 2026-07-13 | `git commit` on `dev` | `8f7a596` — Session freeze: output history panel, widget height caps, lightbox zoom, native download |
+| 2026-07-13 | `git merge` dev -> main | 8f7a596 fast-forward merged to main, pushed |
+| 2026-07-13 | `graphify update` | 375 nodes, 468 edges, 27 communities - rebuilt
