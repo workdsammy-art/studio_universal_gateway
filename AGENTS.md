@@ -8,11 +8,13 @@ These are NOT optional. Every session MUST follow these rules in order:
 
 1. **ISSUES.md**: Append every bug found AND every bug verified as fixed AFTER confirmation. Write the entry immediately upon discovery/verification.
 2. **CHANGELOG.md**: Append an entry for every file change made. Update BEFORE moving to the next task.
-3. **CONTRIBUTING.md**: Update AFTER every git action (commit, push, merge, branch switch).
+3. **CONTRIBUTING.md**: Update AFTER every git action (commit, push, merge, branch switch, **tag**).
 4. **Graphify**: Run `graphify` AFTER every successful build. The knowledge graph must stay current with the codebase.
 5. **AGENTS.md**: Review for staleness at session start. If architecture patterns, file structure, or gotchas have changed, update before proceeding.
 
 Violation of any of these rules is a documentation debt. Do not defer. Do not batch. Update as you go.
+
+**Every merge to `main` MUST be tagged** — no exceptions. If you forget, go back and tag.
 
 ## Current State
 
@@ -165,8 +167,9 @@ app.registerExtension({
 
 - **Single source of truth:** `VERSION` file at repo root
 - **Dashboard** reads version via Vite `define` (`__APP_VERSION__`) at build time
-- **Bump process:** edit `VERSION`, update `dashboard/package.json`, `git tag vX.Y.Z`
+- **Bump process:** edit `VERSION`, update `dashboard/package.json`, `git commit`, `git tag vX.Y.Z`, `git push --tags`
 - **Format:** semver — `vMAJOR.MINOR.PATCH`
+- **Mandatory:** every merge to `main` MUST be tagged. Forgot? Fix it immediately.
 
 ## File Structure
 

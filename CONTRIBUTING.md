@@ -65,6 +65,8 @@ git checkout dev              # switch back to dev for next changes
 
 Version is `vMAJOR.MINOR.PATCH` (semver). Source of truth is the `VERSION` file at repo root.
 
+**Every merge to `main` must be tagged.** No exceptions.
+
 ### Release Steps
 
 ```bash
@@ -113,3 +115,4 @@ git checkout dev
 | 2026-07-13 | `graphify update` | 375 nodes, 468 edges, 27 communities - rebuilt
 | 2026-07-13 | `git commit` on `dev` | v0.1.0 — UI polish pass + versioning infrastructure |
 | 2026-07-13 | `git merge` dev -> main | v0.1.0 released |
+| 2026-07-13 | `git tag` | v0.1.0 tagged and pushed |
