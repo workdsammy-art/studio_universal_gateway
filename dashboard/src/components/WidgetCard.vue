@@ -77,7 +77,7 @@ function onUpdate(val: any) {
           >fx</span>
         </div>
       </div>
-      <div class="mt-2">
+      <div class="mt-2" style="max-width: 100%; overflow-x: auto;">
         <component
           :is="comp"
           :widget="widget"

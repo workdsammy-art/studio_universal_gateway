@@ -17,11 +17,11 @@ function downloadImage(w: any) {
 </script>
 
 <template>
-  <div class="card relative group" style="overflow: hidden;">
+  <div class="relative group">
     <div v-if="widget.data" class="relative">
       <img
         :src="imgUrl(widget)"
-        class="w-full rounded"
+        style="max-width: 100%; height: auto; border-radius: var(--radius-sm); display: block;"
         :alt="widget.name"
       />
       <div class="absolute inset-0 flex items-center justify-center gap-3 transition-opacity opacity-0 group-hover:opacity-100" style="background: rgba(0,0,0,0.6);">

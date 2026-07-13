@@ -20,11 +20,8 @@ let bc: BroadcastChannel | null = null
 let getClientId: () => string | null = () => null
 let toastTimer: ReturnType<typeof setTimeout> | null = null
 
-// ponytail: dashboard control-mode preference that beats the canvas default on
-// resync. canvasModeAtSet records what the canvas said when the user picked the
-// mode, so a later canvas edit can auto-take-effect (drop the override).
-const controlOverrides = reactive<Record<string, { mode: string; canvasModeAtSet: string }>>({})
-const canvasModes: Record<string, string> = {}
+const refreshing = ref(false)
+const controlOverrides = reactive<Record<string, { mode: string }>>({})
 
 function loadOverrides() {
   try {
@@ -95,9 +92,7 @@ function resolveValue(w: any, current: any): any {
 }
 
 async function setControl(w: any, mode: string) {
-  // Remember the canvas mode at set-time so a later canvas edit can take over.
-  const canvasMode = canvasModes[w.name] ?? w.control ?? 'fixed'
-  controlOverrides[w.name] = { mode, canvasModeAtSet: canvasMode }
+  controlOverrides[w.name] = { mode }
   saveOverrides()
   w.control = mode
   try {
@@ -111,35 +106,31 @@ async function setControl(w: any, mode: string) {
   }
 }
 
-// Re-apply dashboard control-mode overrides on top of freshly fetched data.
-// If the canvas mode moved since the user set the override, let the canvas win.
 function applyControlOverrides() {
   for (const w of state.data?.input_widgets || []) {
-    const raw = w.control
-    canvasModes[w.name] = raw
     const o = controlOverrides[w.name]
-    if (o && o.canvasModeAtSet === raw) {
+    if (o) {
       w.control = o.mode
-    } else {
-      if (o) {
-        delete controlOverrides[w.name]
-        saveOverrides()
-      }
-      if (w.dashboard_control) {
-        w.control = w.dashboard_control
-      }
+    } else if (w.dashboard_control) {
+      w.control = w.dashboard_control
     }
   }
 }
 
 async function refreshData() {
-  const prev = state.data
-  await fetchData()
-  if (state.data) {
-    applyControlOverrides()
-    initValues()
-  } else {
-    state.data = prev
+  if (refreshing.value) return
+  refreshing.value = true
+  try {
+    const prev = state.data
+    await fetchData()
+    if (state.data) {
+      applyControlOverrides()
+      initValues()
+    } else {
+      state.data = prev
+    }
+  } finally {
+    refreshing.value = false
   }
 }
 
