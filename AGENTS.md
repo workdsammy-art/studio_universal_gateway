@@ -6,17 +6,18 @@ ComfyUI custom node providing dynamic I/O gateway nodes for dashboard/studio int
 
 These are NOT optional. Every session MUST follow these rules in order:
 
-1. **ISSUES.md**: Append every bug found AND every bug verified as fixed AFTER confirmation. Write the entry immediately upon discovery/verification.
-2. **CHANGELOG.md**: Append an entry for every file change made. Update BEFORE moving to the next task.
-3. **CONTRIBUTING.md**: Update AFTER every git action (commit, push, merge, branch switch, **tag**).
-4. **Graphify**: Run `graphify` AFTER every successful build. The knowledge graph must stay current with the codebase.
-5. **AGENTS.md**: Review for staleness at session start. If architecture patterns, file structure, or gotchas have changed, update before proceeding.
+1. **Branch selection**: Ask the user which branch to work on (`dev` or `standalone-cli`) before starting any session.
+2. **ISSUES.md**: Append every bug found AND every bug verified as fixed AFTER confirmation. Write the entry immediately upon discovery/verification.
+3. **CHANGELOG.md**: Append an entry for every file change made. Update BEFORE moving to the next task.
+4. **CONTRIBUTING.md**: Update AFTER every git action (commit, push, merge, branch switch, **tag**).
+5. **Graphify**: Run `graphify` AFTER every successful build. The knowledge graph must stay current with the codebase.
+6. **AGENTS.md**: Review for staleness at session start. If architecture patterns, file structure, or gotchas have changed, update before proceeding.
 
 Violation of any of these rules is a documentation debt. Do not defer. Do not batch. Update as you go.
 
 **Every merge to `main` MUST be tagged** — no exceptions. If you forget, go back and tag.
 
-**`main` branch is runtime-only.** `dev` has the full workspace (docs, source, config). After every `git merge dev` into `main`, run `git rm -r --cached` on dev-only files before committing. See `CONTRIBUTING.md` for the exact file list and workflow.
+**`main` branch is runtime-only.** `dev` has the full workspace (docs, source, config). `standalone-cli` is for the Headless API Gateway / CLI integration work. After every `git merge dev` into `main`, run `git rm -r --cached` on dev-only files before committing. See `CONTRIBUTING.md` for the exact file list and workflow.
 
 ## Current State
 
@@ -26,6 +27,8 @@ Violation of any of these rules is a documentation debt. Do not defer. Do not ba
 - `POST /gateway/interrupt` endpoint for execution cancellation
 - `CHANGELOG.md` tracks all session history — read first when resuming
 - `VERSION` file at repo root is the single source of truth; dashboard reads it via Vite `define` at build time
+- `SUGGESTIONS.md` contains the phased roadmap for Headless API Gateway / Workflow Hub — read before planning new features
+- See `SUGGESTIONS.md` for the phased roadmap (Headless API Gateway / Workflow Hub) — read before planning new features
 - See `CONTRIBUTING.md` for the git workflow (branches, commit, push, merge, tag — ELI5)
 
 ## V3 Node Patterns
@@ -187,6 +190,7 @@ studio_universal_gateway/
 ├── CHANGELOG.md             # Session history / changelog
 ├── CONTRIBUTING.md          # Git workflow guide
 ├── README.md                # Project overview
+├── SUGGESTIONS.md           # Phased roadmap for future features
 ```
 
 ## Persistence Pattern

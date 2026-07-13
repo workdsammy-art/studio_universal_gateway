@@ -20,6 +20,10 @@ studio_universal_gateway/
 ├── CONTRIBUTING.md          # Git workflow guide
 ```
 
+## Roadmap
+
+See `SUGGESTIONS.md` for the phased feature roadmap (Headless API Gateway, Workflow Hub, synchronous API, Swagger docs, and more).
+
 ## Development
 
 See `CONTRIBUTING.md` for the git workflow (branches, commit, push, merge).

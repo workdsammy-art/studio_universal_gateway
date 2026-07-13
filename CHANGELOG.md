@@ -631,3 +631,23 @@ CONTRIBUTING.md                           (MODIFIED: release workflow)
 - `CONTRIBUTING.md` updated with merge + cleanup workflow for future releases.
 - `requirements.txt` created (zero external deps — ComfyUI provides everything).
 ```
+
+---
+
+## 2026-07-13 — Phased Roadmap & SUGGESTIONS.md
+
+### Changes
+
+- Created `SUGGESTIONS.md` — 7-phase implementation roadmap for Headless API Gateway, Workflow Hub, synchronous API, multi-output type support, live OpenAPI schema, headless mode (canvas bypass), and advanced features. Ordered from lowest to highest impact with dependencies and technical approaches for each phase.
+- Updated `AGENTS.md` — added SUGGESTIONS.md reference in Current State and file structure tree
+- Updated `README.md` — added Roadmap section referencing SUGGESTIONS.md
+- Updated `CONTRIBUTING.md` — added SUGGESTIONS.md to dev-only file list, included in both git rm --cached commands
+
+### Files modified/created
+```
+SUGGESTIONS.md                      (CREATED — 7-phase roadmap)
+AGENTS.md                           (MODIFIED — reference SUGGESTIONS.md)
+README.md                           (MODIFIED — roadmap section)
+CONTRIBUTING.md                     (MODIFIED — SUGGESTIONS.md in file lists + git rm commands)
+CHANGELOG.md                        (UPDATED — this entry)
+```

@@ -2,12 +2,13 @@
 
 Git is like **Save Points in a video game**. Branches are like **separate save files** for experimenting.
 
-## Branches: `main` vs `dev`
+## Branches
 
 | Branch | What it is | Contents | Rule |
 |--------|-----------|----------|------|
 | `main`  | Published version users install via ComfyUI Manager | Runtime files only (no dev docs, no source) | **NEVER** commit here directly. Strip dev files after merge. |
-| `dev`   | Your workshop — try things, break things, fix things | Full workspace including dev tools, docs, source | Make ALL changes here |
+| `dev`   | Your workshop — try things, break things, fix things | Full workspace including dev tools, docs, source | Make ALL general changes here |
+| `standalone-cli` | Headless API Gateway / CLI integration | Same as `dev` (full workspace) | Work on CLI, API, headless features here — forked from `dev` |
 
 ### Files on `main` (runtime only)
 
@@ -31,6 +32,7 @@ AGENTS.md                    # AI assistant instructions
 CHANGELOG.md                 # Session history
 CONTRIBUTING.md              # This file — git workflow guide
 ISSUES.md                    # Bug tracker
+SUGGESTIONS.md               # Phased roadmap
 dashboard/src/               # Vue source (maps to dist/)
 dashboard/index.html         # SPA entry source
 dashboard/package.json       # Build dependency
@@ -70,7 +72,7 @@ git push                      # upload save point to GitHub (dev branch only)
 ```bash
 git checkout main                # switch to main
 git merge dev                    # pull all dev changes into main
-git rm -r --cached AGENTS.md CHANGELOG.md CONTRIBUTING.md ISSUES.md dashboard/src/ dashboard/index.html dashboard/package.json dashboard/package-lock.json dashboard/vite.config.ts dashboard/tsconfig.json dashboard/tsconfig.app.json dashboard/tsconfig.node.json
+git rm -r --cached AGENTS.md CHANGELOG.md CONTRIBUTING.md ISSUES.md SUGGESTIONS.md dashboard/src/ dashboard/index.html dashboard/package.json dashboard/package-lock.json dashboard/vite.config.ts dashboard/tsconfig.json dashboard/tsconfig.app.json dashboard/tsconfig.node.json
 git commit -m "chore: strip dev files for release"
 git tag vX.Y.Z
 git push && git push --tags
@@ -117,7 +119,7 @@ git push
 # 4. Merge to main (with dev-file strip)
 git checkout main
 git merge dev
-git rm -r --cached AGENTS.md CHANGELOG.md CONTRIBUTING.md ISSUES.md dashboard/src/ dashboard/index.html dashboard/package.json dashboard/package-lock.json dashboard/vite.config.ts dashboard/tsconfig.json dashboard/tsconfig.app.json dashboard/tsconfig.node.json
+git rm -r --cached AGENTS.md CHANGELOG.md CONTRIBUTING.md ISSUES.md SUGGESTIONS.md dashboard/src/ dashboard/index.html dashboard/package.json dashboard/package-lock.json dashboard/vite.config.ts dashboard/tsconfig.json dashboard/tsconfig.app.json dashboard/tsconfig.node.json
 git commit -m "chore: strip dev files for v0.2.0"
 
 # 5. Tag and push
