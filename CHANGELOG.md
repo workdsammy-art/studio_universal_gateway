@@ -627,4 +627,7 @@ CONTRIBUTING.md                           (MODIFIED: release workflow)
 - `VERSION`: changed to structured metadata format (semver first line, `---` separator, date + description)
 - `vite.config.ts`: only reads first line of VERSION file (not whole metadata block)
 - `useWebSocket.ts`: removed `updateProgress(1, 1)` call on `executing(null)` — was overwriting progress to 100% after `setStatus('completed')` already nulled it. Root cause: progress bar stuck at 100% on idle with batch count > 1.
+- `main` branch cleaned: removed AGENTS.md, CHANGELOG.md, CONTRIBUTING.md, ISSUES.md, dashboard/src/, build config files — only runtime files remain on main.
+- `CONTRIBUTING.md` updated with merge + cleanup workflow for future releases.
+- `requirements.txt` created (zero external deps — ComfyUI provides everything).
 ```

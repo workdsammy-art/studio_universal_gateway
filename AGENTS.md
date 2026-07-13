@@ -16,6 +16,8 @@ Violation of any of these rules is a documentation debt. Do not defer. Do not ba
 
 **Every merge to `main` MUST be tagged** — no exceptions. If you forget, go back and tag.
 
+**`main` branch is runtime-only.** `dev` has the full workspace (docs, source, config). After every `git merge dev` into `main`, run `git rm -r --cached` on dev-only files before committing. See `CONTRIBUTING.md` for the exact file list and workflow.
+
 ## Current State
 
 - `StudioInputGateway` / `StudioOutputGateway` are implemented (V3 schema)
@@ -178,6 +180,7 @@ studio_universal_gateway/
 ├── __init__.py              # WEB_DIRECTORY, ComfyExtension, comfy_entrypoint
 ├── gateway_nodes.py         # Backend: StudioInputGateway, StudioOutputGateway
 ├── gateway_server.py        # Routes: POST/GET /gateway/data, POST /gateway/run, POST /gateway/interrupt
+├── requirements.txt         # Pip deps (empty — ComfyUI provides everything)
 ├── web/js/studio_gateway.js # Frontend: dynamic slots, custom UI
 ├── VERSION                  # Single source of truth for version
 ├── AGENTS.md                # Agent instructions (this file)

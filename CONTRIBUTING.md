@@ -4,10 +4,40 @@ Git is like **Save Points in a video game**. Branches are like **separate save f
 
 ## Branches: `main` vs `dev`
 
-| Branch | What it is | Rule |
-|--------|-----------|------|
-| `main`  | The published, working version that everyone uses | **NEVER** commit here directly |
-| `dev`   | Your workshop — try things, break things, fix things | Make ALL changes here |
+| Branch | What it is | Contents | Rule |
+|--------|-----------|----------|------|
+| `main`  | Published version users install via ComfyUI Manager | Runtime files only (no dev docs, no source) | **NEVER** commit here directly. Strip dev files after merge. |
+| `dev`   | Your workshop — try things, break things, fix things | Full workspace including dev tools, docs, source | Make ALL changes here |
+
+### Files on `main` (runtime only)
+
+```
+.gitignore
+README.md
+VERSION
+__init__.py
+gateway_nodes.py
+gateway_server.py
+web/js/studio_gateway.js
+dashboard/dist/              # built SPA output
+dashboard/.gitignore
+requirements.txt
+```
+
+### Files on `dev` only (NOT on main)
+
+```
+AGENTS.md                    # AI assistant instructions
+CHANGELOG.md                 # Session history
+CONTRIBUTING.md              # This file — git workflow guide
+ISSUES.md                    # Bug tracker
+dashboard/src/               # Vue source (maps to dist/)
+dashboard/index.html         # SPA entry source
+dashboard/package.json       # Build dependency
+dashboard/package-lock.json  # Build dependency
+dashboard/vite.config.ts     # Build tool
+dashboard/tsconfig*.json     # TypeScript config
+```
 
 ## One-Time Setup: Create the `dev` Branch
 
@@ -38,9 +68,12 @@ git push                      # upload save point to GitHub (dev branch only)
 ### 3. When dev is ready → merge to main
 
 ```bash
-git checkout main             # switch to main
-git merge dev                 # pull all dev changes into main
-git push                      # upload updated main to GitHub
+git checkout main                # switch to main
+git merge dev                    # pull all dev changes into main
+git rm -r --cached AGENTS.md CHANGELOG.md CONTRIBUTING.md ISSUES.md dashboard/src/ dashboard/index.html dashboard/package.json dashboard/package-lock.json dashboard/vite.config.ts dashboard/tsconfig.json dashboard/tsconfig.app.json dashboard/tsconfig.node.json
+git commit -m "chore: strip dev files for release"
+git tag vX.Y.Z
+git push && git push --tags
 ```
 
 ### 4. Back to work
@@ -76,19 +109,22 @@ echo "0.2.0" > VERSION
 # 2. Update dashboard/package.json to match
 #    (edit the "version" field)
 
-# 3. Commit the version bump
-git add VERSION dashboard/package.json dashboard/dist/
+# 3. Commit the version bump on dev
+git add VERSION dashboard/package.json
 git commit -m "v0.2.0"
 git push
 
-# 4. Tag the release
-git tag v0.2.0
-git push --tags
-
-# 5. Merge to main
+# 4. Merge to main (with dev-file strip)
 git checkout main
 git merge dev
-git push
+git rm -r --cached AGENTS.md CHANGELOG.md CONTRIBUTING.md ISSUES.md dashboard/src/ dashboard/index.html dashboard/package.json dashboard/package-lock.json dashboard/vite.config.ts dashboard/tsconfig.json dashboard/tsconfig.app.json dashboard/tsconfig.node.json
+git commit -m "chore: strip dev files for v0.2.0"
+
+# 5. Tag and push
+git tag v0.2.0
+git push && git push --tags
+
+# 6. Back to dev
 git checkout dev
 ```
 
@@ -102,7 +138,7 @@ git checkout dev
 
 ## Golden Rule
 
-**Never commit directly to `main`.** Always work on `dev`, then merge.
+**Never commit directly to `main`.** Always work on `dev`, then merge. After merging, always strip dev-only files before committing.
 
 ---
 
@@ -116,3 +152,4 @@ git checkout dev
 | 2026-07-13 | `git commit` on `dev` | v0.1.0 — UI polish pass + versioning infrastructure |
 | 2026-07-13 | `git merge` dev -> main | v0.1.0 released |
 | 2026-07-13 | `git tag` | v0.1.0 tagged and pushed |
+| 2026-07-13 | `git rm` on `main` | Stripped dev-only files: AGENTS.md, CHANGELOG.md, CONTRIBUTING.md, ISSUES.md, dashboard/src/, build config |
