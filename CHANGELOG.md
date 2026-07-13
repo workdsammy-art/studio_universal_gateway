@@ -1,3 +1,9 @@
+# Changelog
+
+> This file was renamed from `SESSION_LOG.md`. All references below are updated to `CHANGELOG.md`.
+
+---
+
 # Session Log — 2026-07-09
 
 ## What was built
@@ -83,10 +89,11 @@ studio_universal_gateway/
 │   └── dist/*                    (BUILT)
 ├── web/js/
 │   └── studio_gateway.js         (MODIFIED: active_i filter in collectWidgets, defaultName helper for input_0/output_0)
-└── SESSION_LOG.md                (NEW)
+└── CHANGELOG.md                (NEW)
 ```
 
 ---
+
 # Session Log — 2026-07-09 (Session 2)
 
 ## Changes
@@ -133,10 +140,11 @@ studio_universal_gateway/
 │   └── studio_gateway.js           (REWRITTEN: getStore helper, properties.gateway for persistence, removed onSerialize)
 ├── plan_nodes.md                   (DELETED)
 ├── app_plan.md                     (DELETED)
-└── SESSION_LOG.md                  (UPDATED)
+└── CHANGELOG.md                  (UPDATED)
 ```
 
 ---
+
 # Session Log — 2026-07-10
 
 ## Changes
@@ -210,10 +218,11 @@ studio_universal_gateway/
 │   └── dist/*                      (BUILT: 6KB + 87KB)
 ├── web/js/
 │   └── studio_gateway.js           (MODIFIED: auto-detect downstream spec, control_after_generate metadata)
-└── SESSION_LOG.md                  (UPDATED)
+└── CHANGELOG.md                  (UPDATED)
 ```
 
 ---
+
 # Session Log - 2026-07-10 (Session 2)
 
 ## Changes
@@ -235,6 +244,7 @@ studio_universal_gateway/
 See HY3_TODO.md and diff for full details.
 
 ---
+
 # Session Log - 2026-07-10 (Session 4)
 
 ## Outputs Never Appearing — Root Cause Fix (Revised)
@@ -272,10 +282,11 @@ studio_universal_gateway/
 ├── dashboard/src/
 │   ├── App.vue                      (MODIFIED: initValues default-first, values[w.name]=v sync)
 │   └── composables/useWebSocket.ts  (MODIFIED: executing null check, deferred image matching)
-└── SESSION_LOG.md                   (UPDATED)
+└── CHANGELOG.md                   (UPDATED)
 ```
 
 ---
+
 # Session Log - 2026-07-10 (Session 3)
 
 ## HY3_TODO Implementation
@@ -334,7 +345,7 @@ studio_universal_gateway/
 ├── web/js/
 │   └── studio_gateway.js            (MODIFIED: COMBO -> select, options storage/collect)
 ├── HY3_TODO.md                      (UPDATED: status notes)
-└── SESSION_LOG.md                   (UPDATED)
+└── CHANGELOG.md                   (UPDATED)
 ```
 
 
@@ -373,5 +384,5 @@ studio_universal_gateway/
 ├── dashboard/src/
 │   └── App.vue                      (MODIFIED: applyControlOverrides dashboard_control fallback)
 ├── HY3_TODO.md                      (DELETED)
-└── SESSION_LOG.md                   (UPDATED)
+└── CHANGELOG.md                   (UPDATED)
 ```

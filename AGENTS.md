@@ -8,7 +8,8 @@ ComfyUI custom node providing dynamic I/O gateway nodes for dashboard/studio int
 - JS frontend handles dynamic slot management, canvas UI rendering
 - Dashboard is a Vue 3 SPA served at `/gateway` (PrimeVue 4 + Aura theme, Tailwind CSS)
 - `POST /gateway/interrupt` endpoint for execution cancellation
-- `SESSION_LOG.md` tracks all session history — read first when resuming
+- `CHANGELOG.md` tracks all session history — read first when resuming
+- See `CONTRIBUTING.md` for the git workflow (branches, commit, push, merge — ELI5)
 
 ## V3 Node Patterns
 
@@ -156,6 +157,9 @@ studio_universal_gateway/
 ├── gateway_server.py        # Routes: POST/GET /gateway/data, POST /gateway/run, POST /gateway/interrupt
 ├── web/js/studio_gateway.js # Frontend: dynamic slots, custom UI
 ├── AGENTS.md                # Agent instructions (this file)
+├── CHANGELOG.md             # Session history / changelog
+├── CONTRIBUTING.md          # Git workflow guide
+├── README.md                # Project overview
 ```
 
 ## Persistence Pattern
