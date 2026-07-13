@@ -21,7 +21,8 @@ let getClientId: () => string | null = () => null
 let toastTimer: ReturnType<typeof setTimeout> | null = null
 
 const refreshing = ref(false)
-const controlOverrides = reactive<Record<string, { mode: string }>>({})
+const controlOverrides = reactive<Record<string, { mode: string; canvasModeAtSet: string }>>({})
+const canvasModes: Record<string, string> = {}
 
 function loadOverrides() {
   try {
@@ -92,7 +93,8 @@ function resolveValue(w: any, current: any): any {
 }
 
 async function setControl(w: any, mode: string) {
-  controlOverrides[w.name] = { mode }
+  const canvasMode = canvasModes[w.name] ?? 'fixed'
+  controlOverrides[w.name] = { mode, canvasModeAtSet: canvasMode }
   saveOverrides()
   w.control = mode
   try {
@@ -106,25 +108,33 @@ async function setControl(w: any, mode: string) {
   }
 }
 
-function applyControlOverrides() {
+function applyControlOverrides(skipDashboardControl = false) {
   for (const w of state.data?.input_widgets || []) {
+    const raw = w.control ?? 'fixed'
+    canvasModes[w.name] = raw
     const o = controlOverrides[w.name]
-    if (o) {
+    if (o && o.canvasModeAtSet === raw) {
       w.control = o.mode
-    } else if (w.dashboard_control) {
-      w.control = w.dashboard_control
+    } else {
+      if (o) {
+        delete controlOverrides[w.name]
+        saveOverrides()
+      }
+      if (!skipDashboardControl && w.dashboard_control) {
+        w.control = w.dashboard_control
+      }
     }
   }
 }
 
-async function refreshData() {
+async function refreshData(skipDashboardControl = false) {
   if (refreshing.value) return
   refreshing.value = true
   try {
     const prev = state.data
     await fetchData()
     if (state.data) {
-      applyControlOverrides()
+      applyControlOverrides(skipDashboardControl)
       initValues()
     } else {
       state.data = prev
@@ -187,9 +197,13 @@ async function run() {
 
 async function resync() {
   setNeedsSync(false)
+  for (const name of Object.keys(controlOverrides)) {
+    delete controlOverrides[name]
+  }
+  saveOverrides()
   const sent = postToOpener({ type: 'resync' })
   if (!sent) {
-    await refreshData()
+    await refreshData(true)
     lastUpdated = state.data?.last_updated || 0
   }
   showToast('Re-synced')
