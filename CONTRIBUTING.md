@@ -155,3 +155,8 @@ git checkout dev
 | 2026-07-13 | `git merge` dev -> main | v0.1.0 released |
 | 2026-07-13 | `git tag` | v0.1.0 tagged and pushed |
 | 2026-07-13 | `git rm` on `main` | Stripped dev-only files: AGENTS.md, CHANGELOG.md, CONTRIBUTING.md, ISSUES.md, dashboard/src/, build config |
+| 2026-07-13 | `git checkout -b` | Created `standalone-cli` branch from `dev` |
+| 2026-07-13 | `git commit` on `standalone-cli` | `ec9e6a1` — SUGGESTIONS.md phased roadmap + branch infra |
+| 2026-07-13 | `git push -u origin standalone-cli` | Pushed standalone-cli to origin, set upstream |
+| 2026-07-13 | `git merge` standalone-cli -> dev | Fast-forward, dev now has SUGGESTIONS.md branch infra |
+| 2026-07-13 | `git push` dev | dev pushed to origin |
