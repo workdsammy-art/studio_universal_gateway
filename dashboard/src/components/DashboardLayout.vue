@@ -150,6 +150,11 @@ onUnmounted(() => {
 .divider:active {
   background: color-mix(in srgb, var(--primary) 20%, transparent);
 }
+@media (max-width: 1200px) {
+  .col-left { padding-left: var(--space-2); padding-right: var(--space-2); }
+  .col-right { padding-left: var(--space-2); padding-right: var(--space-2); }
+  .col-center { padding-left: var(--space-2); padding-right: var(--space-2); }
+}
 @media (max-width: 900px) {
   .col-left, .col-right, .divider { display: none; }
 }

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+declare const __APP_VERSION__: string
+
 import { reactive, ref, onMounted, onUnmounted, provide } from 'vue'
 import { useGatewayStore } from './composables/useGatewayStore'
 import { useWebSocket } from './composables/useWebSocket'
@@ -368,10 +370,13 @@ onUnmounted(() => {
         </div>
         <div v-if="state.loaded && !state.data" class="flex items-center justify-center flex-col gap-4">
           <img :src="emptyState" alt="No data" style="width: 256px; height: 192px;" />
-          <span class="font-mono text-sm" style="color: var(--text-secondary); opacity: 0.6;">Connect Input/Output Gateway nodes to your workflow</span>
+          <span class="font-mono text-sm" style="color: var(--text-secondary);">Connect Input/Output Gateway nodes to your workflow</span>
         </div>
       </div>
     </main>
+    <footer class="flex items-center justify-center shrink-0" style="height: 28px; border-top: 1px solid var(--surface-border);">
+      <span class="font-mono text-2xs" style="color: var(--text-secondary); opacity: 0.4;">v{{ __APP_VERSION__ }}</span>
+    </footer>
     <AssetPanel
       :visible="showPanel"
       :history="runHistory"

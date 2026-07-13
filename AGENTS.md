@@ -18,10 +18,11 @@ Violation of any of these rules is a documentation debt. Do not defer. Do not ba
 
 - `StudioInputGateway` / `StudioOutputGateway` are implemented (V3 schema)
 - JS frontend handles dynamic slot management, canvas UI rendering
-- Dashboard is a Vue 3 SPA served at `/gateway` (PrimeVue 4 + Aura theme, Tailwind CSS)
+- Dashboard is a Vue 3 SPA served at `/gateway` (zero-dep, native CSS design system)
 - `POST /gateway/interrupt` endpoint for execution cancellation
 - `CHANGELOG.md` tracks all session history — read first when resuming
-- See `CONTRIBUTING.md` for the git workflow (branches, commit, push, merge — ELI5)
+- `VERSION` file at repo root is the single source of truth; dashboard reads it via Vite `define` at build time
+- See `CONTRIBUTING.md` for the git workflow (branches, commit, push, merge, tag — ELI5)
 
 ## V3 Node Patterns
 
@@ -160,6 +161,13 @@ app.registerExtension({
 - `setupNodeInstance()` must be called at end of `nodeCreated`
 - `setupNodeInstance()` resets slot names to `link_N` so `graphToPrompt()` emits correct keys; never change `slot.name` from `link_N` externally
 
+## Versioning
+
+- **Single source of truth:** `VERSION` file at repo root
+- **Dashboard** reads version via Vite `define` (`__APP_VERSION__`) at build time
+- **Bump process:** edit `VERSION`, update `dashboard/package.json`, `git tag vX.Y.Z`
+- **Format:** semver — `vMAJOR.MINOR.PATCH`
+
 ## File Structure
 
 ```
@@ -168,6 +176,7 @@ studio_universal_gateway/
 ├── gateway_nodes.py         # Backend: StudioInputGateway, StudioOutputGateway
 ├── gateway_server.py        # Routes: POST/GET /gateway/data, POST /gateway/run, POST /gateway/interrupt
 ├── web/js/studio_gateway.js # Frontend: dynamic slots, custom UI
+├── VERSION                  # Single source of truth for version
 ├── AGENTS.md                # Agent instructions (this file)
 ├── CHANGELOG.md             # Session history / changelog
 ├── CONTRIBUTING.md          # Git workflow guide

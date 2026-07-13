@@ -61,6 +61,7 @@ async function fetchData() {
 function setStatus(s: Status) {
   state.status = s
   state.isRunning = s === 'running'
+  if (s !== 'running') state.progress = null
 }
 
 function updateProgress(current: number, max: number) {

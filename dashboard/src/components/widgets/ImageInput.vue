@@ -42,11 +42,11 @@ function clearImage() {
     <div v-if="previewUrl" class="relative group">
       <img :src="previewUrl" style="max-width: 100%; height: auto; border-radius: var(--radius-sm); display: block;" alt="uploaded image" />
       <div class="absolute inset-0 flex items-center justify-center gap-3 transition-opacity opacity-0 group-hover:opacity-100" style="background: rgba(0,0,0,0.6);">
-        <label class="btn btn-sm" style="cursor:pointer; background:rgba(255,255,255,0.15); color:#fff; border:none; padding:4px 8px; border-radius:var(--radius-sm); font-size:11px;">
+        <label class="btn btn-sm" style="cursor:pointer; background:rgba(255,255,255,0.15); color:#fff; border:none; padding:4px 8px; border-radius:var(--radius-sm); font-size:11px;" aria-label="Replace image">
           Replace
           <input type="file" accept="image/*" style="display:none" @change="onFileSelected" />
         </label>
-        <button class="btn btn-sm" style="background:rgba(255,255,255,0.15); color:#fff; border:none;" @click="clearImage">Remove</button>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,0.15); color:#fff; border:none;" aria-label="Remove image" @click="clearImage">Remove</button>
       </div>
     </div>
     <label v-else class="upload-btn">
@@ -66,7 +66,7 @@ function clearImage() {
   padding: 10px 12px;
   border-radius: var(--radius-sm, 6px);
   cursor: pointer;
-  border: 1px dashed var(--border-color, #555);
+  border: 1px dashed var(--input-border);
   transition: border-color 0.15s;
 }
 .upload-btn:hover {

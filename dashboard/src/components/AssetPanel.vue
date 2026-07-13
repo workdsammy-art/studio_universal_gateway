@@ -37,10 +37,7 @@ function downloadAsset(a: any) {
   document.body.removeChild(link)
 }
 
-function isImage(a: AssetRecord) { return a.ui_type === 'image' }
-function isMetrics(a: AssetRecord) { return a.ui_type === 'metrics' }
-function isColor(a: AssetRecord) { return a.ui_type === 'color' }
-function isToggle(a: AssetRecord) { return a.ui_type === 'toggle' }
+
 </script>
 
 <template>
@@ -52,17 +49,20 @@ function isToggle(a: AssetRecord) { return a.ui_type === 'toggle' }
       <div class="panel-header">
         <span class="font-mono text-xs font-bold uppercase tracking-widest" style="color: var(--text-secondary);">Output History</span>
         <div class="flex items-center gap-2">
-          <button v-if="history.length" class="btn btn-danger-outline btn-sm" @click="emit('clear')" title="Clear all">
+          <button v-if="history.length" class="btn btn-danger-outline btn-sm" @click="emit('clear')" title="Clear all" aria-label="Clear all output history">
             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           </button>
-          <button class="btn btn-outline btn-icon btn-sm" @click="emit('close')">
+          <button class="btn btn-outline btn-icon btn-sm" aria-label="Close panel" @click="emit('close')">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
       </div>
 
       <div v-if="history.length === 0" class="panel-empty">
-        <span class="font-mono text-xs" style="color: var(--text-secondary); opacity: 0.5;">No runs yet</span>
+        <div class="flex flex-col items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--text-secondary); opacity: 0.4;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+          <span class="font-mono text-xs" style="color: var(--text-secondary); opacity: 0.5;">No runs yet</span>
+        </div>
       </div>
 
       <div v-else class="panel-body">
@@ -82,24 +82,24 @@ function isToggle(a: AssetRecord) { return a.ui_type === 'toggle' }
           <div v-if="!collapsed.has(run.id)" class="run-assets">
             <div v-for="(a, idx) in run.assets" :key="idx" class="asset-item">
               <div class="asset-label">{{ a.name }}</div>
-              <div v-if="isImage(a) && a.data" class="asset-thumb">
+              <div v-if="a.ui_type === 'image' && a.data" class="asset-thumb">
                 <img :src="imgUrl(a)" alt="" />
                 <div class="thumb-overlay">
-                  <button class="btn btn-sm" style="background: rgba(255,255,255,0.15); color: #fff; border: none;" @click.stop="lightbox = { filename: a.data, subfolder: a.subfolder || '', type: a.type || 'output', name: a.name }">
+                  <button class="btn btn-sm" style="background: rgba(255,255,255,0.15); color: #fff; border: none;" aria-label="Zoom image" @click.stop="lightbox = { filename: a.data, subfolder: a.subfolder || '', type: a.type || 'output', name: a.name }">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
                   </button>
-                  <button class="btn btn-sm" style="background: rgba(255,255,255,0.15); color: #fff; border: none;" @click.stop="downloadAsset(a)">
+                  <button class="btn btn-sm" style="background: rgba(255,255,255,0.15); color: #fff; border: none;" aria-label="Download image" @click.stop="downloadAsset(a)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   </button>
                 </div>
               </div>
-              <div v-else-if="isColor(a) && a.data" class="asset-color" :style="{ background: a.data }">
+              <div v-else-if="a.ui_type === 'color' && a.data" class="asset-color" :style="{ background: a.data }">
                 <span class="font-mono text-2xs" style="mix-blend-mode: difference; color: #fff;">{{ a.data }}</span>
               </div>
-              <div v-else-if="isMetrics(a) && a.data" class="asset-metrics">
+              <div v-else-if="a.ui_type === 'metrics' && a.data" class="asset-metrics">
                 <pre class="font-mono text-2xs whitespace-pre-wrap break-words">{{ typeof a.data === 'object' ? JSON.stringify(a.data, null, 2) : String(a.data) }}</pre>
               </div>
-              <div v-else-if="isToggle(a)" class="asset-toggle">
+              <div v-else-if="a.ui_type === 'toggle'" class="asset-toggle">
                 <span class="font-mono text-2xs" :style="{ color: a.data ? 'var(--success)' : 'var(--text-secondary)' }">{{ a.data ? 'true' : 'false' }}</span>
               </div>
               <div v-else class="asset-value">
@@ -118,7 +118,7 @@ function isToggle(a: AssetRecord) { return a.ui_type === 'toggle' }
         :src="'/view?filename=' + lightbox.filename + (lightbox.subfolder ? '&subfolder=' + lightbox.subfolder : '') + '&type=' + lightbox.type"
         alt=""
       />
-      <button class="btn btn-sm lightbox-download" @click.stop="downloadAsset(lightbox)">
+      <button class="btn btn-sm lightbox-download" aria-label="Download full-size image" @click.stop="downloadAsset(lightbox)">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </button>
     </div>

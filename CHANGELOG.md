@@ -543,3 +543,88 @@ dashboard/src/components/
     └── ImageViewer.vue           (MODIFIED: margin:0 auto, native download)
 CHANGELOG.md                      (UPDATED)
 ```
+
+## 2026-07-13 — UI Polish Pass
+
+### Changes
+
+**Ponytail audit fixes:**
+- `style.css`: deleted unused `.progress-glow` class & duplicate `@media (prefers-reduced-motion: reduce)` block (-6 lines)
+- `public/icons.svg`: deleted unused SVG sprite
+- `AssetPanel.vue`: inlined 4 single-use boolean helpers (`isImage`, `isMetrics`, `isColor`, `isToggle`) — removed 4 function declarations
+- `WidgetCard.vue`: removed redundant `widget.control = mode` assignment (setControl already does it)
+- `Toolbar.vue` `.batch-count`: replaced fallback CSS vars with project design tokens
+- `ImageInput.vue` `.upload-btn`: replaced `--border-color, #555` fallback with `--input-border`
+
+**CSS refinements:**
+- Success color `#00FF66` → `#22C55E` across both themes (less harsh in dark & light)
+
+**Toolbar restructure (grid layout):**
+- Converted to CSS grid `1fr auto 1fr` for proper left/center/right alignment
+- Progress bar + cancel + status now centered in the navbar always
+- Progress bar always visible (idle at 0%)
+- Version badge removed from toolbar (moved to footer)
+- Standardized all toolbar elements to 28px height
+- Batch counter: added `-` / `+` buttons, min=1, spinners hidden via CSS
+
+**Idle timer:**
+- After "Completed", auto-switches to "Idle" after 2 seconds
+- Implemented via local `watch` on `state.status` with `setTimeout` cleanup on unmount
+
+**Footer bar:**
+- New thin footer (28px, top border) at bottom of page
+- Centered `v0.1.0` version text
+
+**Accessibility:**
+- Added `aria-label` to all icon-only buttons (theme toggle, panel toggle, clear/close history, zoom/download overlays)
+- Fixed nested `<label>` in ToggleInput.vue (inner `<label class="toggle">` → `<span class="toggle">`)
+
+**Visual refinements:**
+- "waiting for data...": removed stacked `opacity: 0.4` (kept italic + --text-secondary)
+- Empty state "Connect Input/Output Gateway...": removed `opacity: 0.6`
+- Toast container: moved from bottom-right to bottom-left (avoids AssetPanel overlap), bumped to 52px from bottom (above footer)
+- AssetPanel empty state: added "no image" cross icon SVG above "No runs yet"
+
+**Animations & responsive:**
+- Widget cards: subtle fade-in + translateY animation on mount (respects `prefers-reduced-motion`)
+- DashboardLayout: reduced padding at 900-1200px viewport width
+
+### Files modified
+```
+dashboard/src/style.css                       (MODIFIED: deleted dead CSS, success color, toast position)
+dashboard/src/App.vue                         (MODIFIED: added footer)
+dashboard/src/components/Toolbar.vue          (REWRITTEN: flex + absolute center layout, batch +/- buttons, idle timer, a11y, standardized heights, wider progress bar)
+dashboard/src/composables/useGatewayStore.ts   (MODIFIED: reset progress on non-running status)
+dashboard/src/components/WidgetCard.vue        (MODIFIED: double set fix, card animation)
+dashboard/src/components/AssetPanel.vue        (MODIFIED: inlined booleans, empty state icon, a11y)
+dashboard/src/components/DashboardLayout.vue  (MODIFIED: responsive padding)
+dashboard/src/components/widgets/ToggleInput.vue (MODIFIED: nested label fix)
+dashboard/src/components/widgets/ImageViewer.vue (MODIFIED: a11y)
+dashboard/src/components/widgets/ImageInput.vue   (MODIFIED: CSS tokens, a11y)
+dashboard/public/icons.svg                    (DELETED)
+```
+
+## 2026-07-13 — Versioning Infrastructure (v0.1.0)
+
+### Changes
+
+- Created `VERSION` file at repo root as single source of truth (`0.1.0`)
+- Wired `VERSION` into dashboard build via Vite `define` (`__APP_VERSION__` global constant)
+- App.vue footer now renders `v{{ __APP_VERSION__ }}` dynamically instead of hardcoded text
+- `AGENTS.md`: added Versioning section, fixed stale PrimeVue/Tailwind ref, added VERSION to file tree
+- `CONTRIBUTING.md`: added "Releasing a Version" section with full git tag workflow + semver bump rules
+
+### Files modified/created
+```
+VERSION                                   (CREATED)
+dashboard/vite.config.ts                  (MODIFIED: read VERSION into define)
+dashboard/src/App.vue                     (MODIFIED: dynamic version in footer)
+AGENTS.md                                 (MODIFIED: versioning section, file tree)
+CONTRIBUTING.md                           (MODIFIED: release workflow)
+```
+
+### Fixes applied during testing
+- `VERSION`: changed to structured metadata format (semver first line, `---` separator, date + description)
+- `vite.config.ts`: only reads first line of VERSION file (not whole metadata block)
+- `useWebSocket.ts`: removed `updateProgress(1, 1)` call on `executing(null)` — was overwriting progress to 100% after `setStatus('completed')` already nulled it. Root cause: progress bar stuck at 100% on idle with batch count > 1.
+```

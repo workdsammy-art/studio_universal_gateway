@@ -81,7 +81,6 @@ export function useWebSocket(callbacks?: { onExecuted?: (assets: any[], outputWi
           flushImages()
           setStatus('completed')
           setPromptId(null)
-          updateProgress(1, 1)
         }
         break
 

@@ -45,7 +45,6 @@ const ctrlOptions = ['fixed', 'randomize', 'increment', 'decrement']
 
 function onControlChange(e: Event) {
   const mode = (e.target as HTMLSelectElement).value
-  widget.value.control = mode
   if (setControl) setControl(widget.value, mode)
 }
 
@@ -90,12 +89,19 @@ function onUpdate(val: any) {
           @update:model-value="onUpdate"
         />
       </div>
-      <span v-if="!isInput && widget.data === undefined" class="block mt-1 font-mono text-sm italic" style="color: var(--text-secondary); opacity: 0.4;">waiting for data...</span>
+      <span v-if="!isInput && widget.data === undefined" class="block mt-1 font-mono text-sm italic" style="color: var(--text-secondary);">waiting for data...</span>
     </div>
   </div>
 </template>
 
 <style scoped>
+.card {
+  animation: card-fade-in 0.25s ease-out;
+}
+@keyframes card-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 .mode-select {
   font-family: monospace;
   font-size: 10px;
@@ -110,5 +116,8 @@ function onUpdate(val: any) {
 }
 .mode-select:focus {
   border-color: var(--accent-color);
+}
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: none; }
 }
 </style>

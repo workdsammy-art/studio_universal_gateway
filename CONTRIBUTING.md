@@ -61,6 +61,43 @@ git checkout dev              # switch back to dev for next changes
 | `git merge <branch>` | Copy changes from one branch into current |
 | `git status` | See what files changed |
 
+## Releasing a Version
+
+Version is `vMAJOR.MINOR.PATCH` (semver). Source of truth is the `VERSION` file at repo root.
+
+### Release Steps
+
+```bash
+# 1. Update VERSION file (edit manually)
+echo "0.2.0" > VERSION
+
+# 2. Update dashboard/package.json to match
+#    (edit the "version" field)
+
+# 3. Commit the version bump
+git add VERSION dashboard/package.json dashboard/dist/
+git commit -m "v0.2.0"
+git push
+
+# 4. Tag the release
+git tag v0.2.0
+git push --tags
+
+# 5. Merge to main
+git checkout main
+git merge dev
+git push
+git checkout dev
+```
+
+### Version Bump Rules
+
+| Change | Bump |
+|--------|------|
+| Bug fixes, minor tweaks | PATCH (0.1.0 → 0.1.1) |
+| New features, backward-compatible | MINOR (0.1.0 → 0.2.0) |
+| Breaking API/workflow changes | MAJOR (0.1.0 → 1.0.0) |
+
 ## Golden Rule
 
 **Never commit directly to `main`.** Always work on `dev`, then merge.
@@ -74,3 +111,5 @@ git checkout dev              # switch back to dev for next changes
 | 2026-07-13 | `git commit` on `dev` | `8f7a596` — Session freeze: output history panel, widget height caps, lightbox zoom, native download |
 | 2026-07-13 | `git merge` dev -> main | 8f7a596 fast-forward merged to main, pushed |
 | 2026-07-13 | `graphify update` | 375 nodes, 468 edges, 27 communities - rebuilt
+| 2026-07-13 | `git commit` on `dev` | v0.1.0 — UI polish pass + versioning infrastructure |
+| 2026-07-13 | `git merge` dev -> main | v0.1.0 released |
