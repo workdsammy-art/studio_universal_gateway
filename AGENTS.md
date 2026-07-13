@@ -2,6 +2,18 @@
 
 ComfyUI custom node providing dynamic I/O gateway nodes for dashboard/studio integration.
 
+## ⚠️ IMPERATIVE MAINTENANCE RULES
+
+These are NOT optional. Every session MUST follow these rules in order:
+
+1. **ISSUES.md**: Append every bug found AND every bug verified as fixed AFTER confirmation. Write the entry immediately upon discovery/verification.
+2. **CHANGELOG.md**: Append an entry for every file change made. Update BEFORE moving to the next task.
+3. **CONTRIBUTING.md**: Update AFTER every git action (commit, push, merge, branch switch).
+4. **Graphify**: Run `graphify` AFTER every successful build. The knowledge graph must stay current with the codebase.
+5. **AGENTS.md**: Review for staleness at session start. If architecture patterns, file structure, or gotchas have changed, update before proceeding.
+
+Violation of any of these rules is a documentation debt. Do not defer. Do not batch. Update as you go.
+
 ## Current State
 
 - `StudioInputGateway` / `StudioOutputGateway` are implemented (V3 schema)

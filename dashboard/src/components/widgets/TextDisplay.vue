@@ -23,7 +23,7 @@ const modelValue = defineModel<any>()
       :placeholder="widget.name"
     />
   </div>
-  <div v-else class="font-mono text-sm whitespace-pre-wrap break-words" style="max-height: 12rem; overflow-y: auto; color: var(--text-color);">
+  <div v-else class="font-mono text-sm whitespace-pre-wrap break-words" style="max-height: 30vh; overflow-y: auto; color: var(--text-color);">
     {{ modelValue !== undefined && modelValue !== null ? String(modelValue) : '—' }}
   </div>
 </template>

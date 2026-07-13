@@ -4,6 +4,7 @@ import uuid
 from pathlib import Path
 
 import execution
+import nodes
 from aiohttp import web
 from server import PromptServer
 
@@ -105,8 +106,7 @@ async def post_run(request):
 
 @routes.post("/gateway/interrupt")
 async def post_interrupt(request):
-    server = PromptServer.instance
-    server.interrupt()
+    nodes.interrupt_processing()
     return web.json_response({"status": "interrupted"})
 
 

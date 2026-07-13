@@ -301,6 +301,10 @@ async function handleNameClick(node, index, current) {
         return;
     }
     getStore(node)[`name_${index}`] = trimmed;
+    if (isInputGateway(node)) {
+        const slots = getAllSlots(node);
+        if (slots[index]) slots[index].name = trimmed;
+    }
     syncSlotNames(node);
     node.setDirtyCanvas(true, true);
 }

@@ -20,8 +20,8 @@ export function useWebSocket(callbacks?: { onExecuted?: (assets: any[], outputWi
       try {
         const msg = JSON.parse(event.data)
         handleMessage(msg)
-      } catch {
-        // ignore malformed messages
+      } catch (e) {
+        console.warn('useWebSocket message error:', e)
       }
     }
 
@@ -97,8 +97,9 @@ export function useWebSocket(callbacks?: { onExecuted?: (assets: any[], outputWi
         if (msg.data?.output?.audio) {
           for (const a of msg.data.output.audio) pendingImages.push(normalizeMedia(a))
         }
-        if (msg.data?.output?.studio_assets) {
-          const assets = msg.data.output.studio_assets
+        const sa = msg.data?.output?.studio_assets || msg.data?.ui?.studio_assets
+        if (sa) {
+          const assets = Array.isArray(sa) ? sa : Object.values(sa)
           if (state.data?.output_widgets) {
             const widgets = state.data.output_widgets
             for (const asset of assets) {

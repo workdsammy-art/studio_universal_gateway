@@ -5,12 +5,16 @@ import { useWebSocket } from './composables/useWebSocket'
 import DashboardLayout from './components/DashboardLayout.vue'
 import Toolbar from './components/Toolbar.vue'
 import SyncBanner from './components/SyncBanner.vue'
+import AssetPanel from './components/AssetPanel.vue'
 import emptyState from './assets/empty-state.svg'
 
 const { state, fetchData, setError, setNeedsSync } = useGatewayStore()
 const values = reactive<Record<string, any>>({})
 const lastSubmitted = reactive<Record<string, any>>({})
-const pastGenerations = reactive<{ filename: string; subfolder: string }[]>([])
+const showPanel = ref(false)
+interface AssetRecord { name: string; data: any; ui_type: string; subfolder?: string; type?: string }
+interface RunRecord { id: number; timestamp: number; assets: AssetRecord[] }
+const runHistory = reactive<RunRecord[]>([])
 const isDark = ref(true)
 const toasts = reactive<string[]>([])
 
@@ -21,6 +25,7 @@ let getClientId: () => string | null = () => null
 let toastTimer: ReturnType<typeof setTimeout> | null = null
 
 const refreshing = ref(false)
+const batchCount = ref(1)
 const controlOverrides = reactive<Record<string, { mode: string; canvasModeAtSet: string }>>({})
 const canvasModes: Record<string, string> = {}
 
@@ -70,9 +75,12 @@ function resolveValue(w: any, current: any): any {
 
   switch (ctrl) {
     case 'randomize': {
-      const steps = Math.floor((max - min) / step)
+      const emax = Math.min(max, Number.MAX_SAFE_INTEGER)
+      const emin = Math.min(min, Number.MAX_SAFE_INTEGER)
+      if (emax <= emin) return emin
+      const steps = Math.floor((emax - emin) / step)
       const r = Math.floor(Math.random() * (steps + 1))
-      const v = min + r * step
+      const v = emin + r * step
       return isInt ? Math.round(v) : parseFloat(v.toFixed(10))
     }
     case 'increment': {
@@ -163,34 +171,38 @@ async function run() {
       setTimeout(resolve, 2500)
     })
   }
-  await refreshData()
+  await refreshData(true)
 
-  const runValues: Record<string, any> = {}
-  for (const w of state.data?.input_widgets || []) {
-    if (w.name in values) {
-      const v = resolveValue(w, values[w.name])
-      runValues[w.name] = v
-      values[w.name] = v
+  const bc = batchCount.value
+  for (let b = 0; b < bc; b++) {
+    setError(null)
+    const runValues: Record<string, any> = {}
+    for (const w of state.data?.input_widgets || []) {
+      if (w.name in values) {
+        const v = resolveValue(w, values[w.name])
+        runValues[w.name] = v
+        values[w.name] = v
+      }
     }
-  }
-  Object.assign(lastSubmitted, runValues)
-  const clientId = getClientId()
-  const sent = postToOpener({ type: 'run', values: runValues, client_id: clientId })
-  if (!sent) {
-    try {
-      const resp = await fetch('/gateway/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          output: state.data?.output,
-          workflow: state.data?.workflow,
-          values: runValues,
-          client_id: clientId,
-        }),
-      })
-      const result = await resp.json()
-    } catch (e) {
-      setError((e as Error).message)
+    Object.assign(lastSubmitted, runValues)
+    const clientId = getClientId()
+    const sent = postToOpener({ type: 'run', values: runValues, client_id: clientId })
+    if (!sent) {
+      try {
+        const resp = await fetch('/gateway/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            output: state.data?.output,
+            workflow: state.data?.workflow,
+            values: runValues,
+            client_id: clientId,
+          }),
+        })
+        const result = await resp.json()
+      } catch (e) {
+        setError((e as Error).message)
+      }
     }
   }
 }
@@ -243,15 +255,18 @@ function initValues() {
 }
 
 function onExecuted(assets: any[], outputWidgets: any[]) {
+  const runAssets: AssetRecord[] = []
   for (const asset of assets) {
     const w = outputWidgets.find((w: any) => w.name === asset.name)
-    if (w && w.ui_type === 'image' && asset.data) {
-      const filename = String(asset.data)
-      if (!pastGenerations.some((g) => g.filename === filename)) {
-        pastGenerations.push({ filename, subfolder: asset.subfolder || '' })
-      }
-    }
+    runAssets.push({
+      name: asset.name,
+      data: w?.data ?? asset.data,
+      ui_type: w?.ui_type || asset.ui_type || 'text',
+      subfolder: w?.subfolder || asset.subfolder || '',
+      type: w?.type || asset.type || 'output',
+    })
   }
+  runHistory.unshift({ id: state.promptId || 'run_' + Date.now(), timestamp: Date.now(), assets: runAssets })
 }
 
 async function cancel() {
@@ -262,8 +277,8 @@ async function cancel() {
   }
 }
 
-function clearPastGenerations() {
-  pastGenerations.splice(0, pastGenerations.length)
+function clearHistory() {
+  runHistory.splice(0, runHistory.length)
 }
 
 function handleMessage(event: MessageEvent) {
@@ -273,7 +288,6 @@ function handleMessage(event: MessageEvent) {
   if (data.type === 'resynced') {
     refreshData().then(() => {
       lastUpdated = state.data?.last_updated || 0
-      showToast('Re-synced')
     })
   } else if (data.type === 'run_error') {
     setError(data.message || 'Run failed')
@@ -336,14 +350,13 @@ onUnmounted(() => {
   </div>
   <div class="flex flex-col" style="min-height: 100vh; background: var(--surface-ground); color: var(--text-color);">
     <SyncBanner v-if="state.needsSync" @resync="resync" />
-    <Toolbar :is-dark="isDark" @run="run" @cancel="cancel" @resync="resync" @toggle-theme="toggleTheme" />
+    <Toolbar :is-dark="isDark" :batch-count="batchCount" :show-panel="showPanel" @update:batch-count="batchCount = $event" @run="($event: number) => run()" @cancel="cancel" @resync="resync" @toggle-theme="toggleTheme" @toggle-panel="showPanel = !showPanel" />
     <main class="flex-1 flex flex-col min-h-0">
-      <DashboardLayout
-        v-if="state.loaded && state.data"
-        :data="state.data"
-        :past-generations="pastGenerations"
-        @clear="clearPastGenerations"
-      />
+      <template v-if="state.loaded && state.data">
+        <DashboardLayout
+          :data="state.data"
+        />
+      </template>
       <div v-else class="flex-1 flex items-center justify-center">
         <div v-if="!state.loaded" class="flex flex-col gap-3" style="width: 400px;">
           <div class="skeleton" style="height: 20px; width: 60%;"></div>
@@ -359,5 +372,11 @@ onUnmounted(() => {
         </div>
       </div>
     </main>
+    <AssetPanel
+      :visible="showPanel"
+      :history="runHistory"
+      @clear="clearHistory"
+      @close="showPanel = false"
+    />
   </div>
 </template>

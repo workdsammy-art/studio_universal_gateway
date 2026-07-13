@@ -6,6 +6,7 @@ import ColorInput from './widgets/ColorInput.vue'
 import TextDisplay from './widgets/TextDisplay.vue'
 import MetricsCard from './widgets/MetricsCard.vue'
 import ImageViewer from './widgets/ImageViewer.vue'
+import ImageInput from './widgets/ImageInput.vue'
 import SelectInput from './widgets/SelectInput.vue'
 
 const props = defineProps<{
@@ -26,11 +27,14 @@ const compMap: Record<string, any> = {
   "text(multiline)": TextDisplay,
   number: TextDisplay,
   metrics: MetricsCard,
-  image: ImageViewer,
+  image: ImageInput,
   select: SelectInput,
 }
 
-const comp = computed(() => compMap[widget.value.ui_type] || TextDisplay)
+const comp = computed(() => {
+  if (widget.value.ui_type === 'image') return isInput.value ? ImageInput : ImageViewer
+  return compMap[widget.value.ui_type] || TextDisplay
+})
 
 const isNumeric = computed(() => {
   const t = widget.value.ui_type

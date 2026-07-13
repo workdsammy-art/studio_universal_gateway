@@ -386,3 +386,160 @@ studio_universal_gateway/
 ├── HY3_TODO.md                      (DELETED)
 └── CHANGELOG.md                   (UPDATED)
 ```
+
+---
+
+# Session Log - 2026-07-13 (Round 5)
+
+## Changes
+
+### Bug Fix: Resync notification on every run
+- **`dashboard/src/App.vue:273`** — Removed `showToast('Re-synced')` from `handleMessage`'s `'resynced'` case. The explicit `resync()` function already shows its own toast; the auto-resync during `run()` was causing a redundant notification.
+
+### Bug Fix: Outputs never appear — studio_assets iteration crash
+- **`dashboard/src/composables/useWebSocket.ts:100-113`** — `studio_assets` is a JSON object, not an array. `for...of` on an object throws silently (caught by line 22-25). Changed to `Object.entries()` with proper key-based widget lookup. Added `console.warn` to the catch block.
+- Also fixed `flushImages()` data flow: `pendingStudioAssets` now receives `{name, ...asset}` entries.
+
+### Bug Fix: Increment/Decrement not honoring canvas mode changes
+- **`dashboard/src/App.vue:166`** — `run()` called `refreshData()` with `skipDashboardControl=false`, causing `dashboard_control` from prior dashboard sessions to override the canvas node's freshly changed control mode. Changed to `refreshData(true)` so the canvas mode is always honored on run.
+
+### Bug Fix: Randomize generates seeds above MAX_SAFE_INTEGER, breaking increment
+- **`dashboard/src/App.vue:72-77`** — `resolveValue`'s `randomize` case now caps the range at `Number.MAX_SAFE_INTEGER`. JavaScript's Number can't exactly represent integers above ~9e15; at 1.6e19 the ULP is 2048, so adding 1 doesn't change the value. Capping ensures all generated values are exactly representable and increment/decrement works correctly.
+
+### Bug Fix: Text outputs not showing (studio_assets is array in msg.data.ui)
+- **`dashboard/src/composables/useWebSocket.ts:100-115`** — Two bugs: `studio_assets` is an **array** (not dict) and lives in `msg.data.ui` (from `io.NodeOutput(ui=...)`). Fixed: check both `msg.data.output` and `msg.data.ui`; iterate with `for...of` using `asset.name` directly instead of `Object.entries` index.
+
+### Feature: Input Gateway output slots show user-facing name
+- **`web/js/studio_gateway.js:303-307`** — `handleNameClick` now updates `slot.name` to the trimmed name for Input Gateway output ports. Output slot names are not used in prompt serialization (connections are serialized by index), so it's safe. Output Gateway input slots remain `link_N` because they become kwargs keys.
+
+### Feature: Image upload for image-type input widgets
+- **`dashboard/src/components/widgets/ImageInput.vue`** (NEW) — File picker, uploads to `/upload/image`, preview thumbnail, replace/remove controls.
+- **`dashboard/src/components/WidgetCard.vue`** — Routes `image` type to `ImageInput` for inputs and `ImageViewer` for outputs.
+
+### Documentation Maintenance
+- **`AGENTS.md`** — Added imperative maintenance rules section (Issues/Changelog/Contributing/Graphify/Agents update requirements)
+- **`ISSUES.md`** — Appended 6 bug/feature entries
+- **`CHANGELOG.md`** — This entry
+
+## Files Changed
+```
+studio_universal_gateway/
+├── web/js/
+│   └── studio_gateway.js             (MODIFIED: slot.name update for Input Gateway)
+├── dashboard/src/
+│   ├── App.vue                      (MODIFIED: MAX_SAFE_INTEGER cap in randomize)
+│   ├── components/WidgetCard.vue    (MODIFIED: image -> ImageInput/ImageViewer split)
+│   ├── components/widgets/ImageInput.vue (NEW)
+│   └── composables/useWebSocket.ts  (MODIFIED: Object.entries for studio_assets, catch warn)
+├── AGENTS.md                         (MODIFIED: imperative maintenance rules)
+├── ISSUES.md                         (MODIFIED: 6 bug/feature entries)
+└── CHANGELOG.md                      (UPDATED)
+```
+
+---
+
+# Session Log — 2026-07-13 (Round 6)
+
+## Changes
+
+### Bug Fix: Cancel button throws "PromptServer has no attribute 'interrupt'" (revised)
+- **`gateway_server.py:6`** — Changed `import execution` to `import nodes`. The `execution` module does not expose `interrupt_processing()`.
+- **`gateway_server.py:108`** — Changed `execution.interrupt_processing()` to `nodes.interrupt_processing()`. This matches ComfyUI's own `POST /interrupt` endpoint (`nodes.interrupt_processing()` at server.py:1148/1154).
+
+## Files Changed
+```
+studio_universal_gateway/
+├── gateway_server.py                 (MODIFIED: import nodes, call nodes.interrupt_processing())
+├── ISSUES.md                         (MODIFIED: bug entry revised)
+└── CHANGELOG.md                      (UPDATED)
+```
+
+---
+
+# Session Log — 2026-07-13 (Round 7)
+
+## Changes
+
+### Feature: Output History Panel (replaces PastGenerations)
+
+- **`App.vue`** — Added `runHistory` reactive array of per-run snapshots (`RunRecord`). `onExecuted` now captures ALL asset types (not just images) into a record with `{ name, data, ui_type, subfolder, type }` per asset. Added `showPanel` toggle ref and `clearHistory()` to clear all history.
+- **`AssetPanel.vue`** (NEW) — Overlay panel that slides in/out from the right edge. Shows runs with collapsible headers, timestamps, and per-type asset rendering: image thumbnails with lightbox, metrics as formatted `<pre>`, color swatches, toggle true/false badges, text/numbers inline. Close on backdrop click or X button. Clear-all button.
+- **`Toolbar.vue`** — Added `showPanel` prop and `togglePanel` emit. Grid-icon toggle button on the right toolbar area. Highlighted orange (`btn-active` style) when panel is open.
+- **`DashboardLayout.vue`** — Removed `PastGenerations` import and passing (deprecated).
+- **`PastGenerations.vue`** — DELETED (superseded by AssetPanel).
+
+### Bug Fix: Asset Panel outputs not displaying
+- **`AssetPanel.vue:29`** — Removed the overly broad `isImage()` fallback `a.data.includes('.')` that misclassified text with dots as images.
+- **`App.vue:254`** — `onExecuted` now reads data from `w?.data ?? asset.data` (widget first). `flushImages()` sets data on the widget but not the asset, so `asset.data` was null for images filled from pendingImages.
+- **`AssetPanel.vue`** — Removed `display: flex; flex-direction: column; gap: 8px` from `.panel-body`. The flex layout made content stretch to fit the viewport, preventing scroll. Replaced with block layout + `.run-card + .run-card { margin-top: 8px }`. Removed `max-height` hack.
+- **`App.vue`** — Removed `nextRunId` counter. `runHistory` now uses `state.promptId` as the run label (prompt UUID from `execution_start` message).
+
+### Bug Fix: Asset Panel scroll still broken (sticky header approach)
+- **`AssetPanel.vue`** — Complete rewrite of layout:
+  - Removed `@wheel.prevent` from overlay (was blocking child scroll events).
+  - Overlay and panel are now sibling `position: fixed` elements (separate `<Transition>` wrappers) — no parent/child nesting.
+  - `.asset-panel` is now the scroll container: `overflow-y: auto; overscroll-behavior: contain`.
+  - `.panel-header` uses `position: sticky; top: 0; z-index: 1; background: var(--surface-ground)`.
+  - `.panel-body` is normal flow block (no `position: absolute`, no `display: flex`, no scroll properties).
+  - All `overflow: hidden` removed from panel and overlay.
+
+### Feature: Cap oversized output content in Asset Panel
+- **`AssetPanel.vue`** — Added viewport-relative max-height limits to prevent single outputs from dominating the panel:
+  - `.asset-thumb`: `max-height: 50vh` (images)
+  - `.asset-metrics pre`: `max-height: 40vh` (JSON, was hardcoded 120px)
+  - `.asset-value`: `max-height: 40vh; overflow-y: auto` (text/numbers, was unconstrained)
+
+## Files Changed
+```
+studio_universal_gateway/
+├── dashboard/src/
+│   ├── App.vue                      (MODIFIED: onExecuted uses promptId, removed nextRunId)
+│   └── components/
+│       └── AssetPanel.vue           (REWRITTEN: sticky header, panel is scroll container, sibling overlay)
+├── ISSUES.md                        (MODIFIED: bug entry)
+└── CHANGELOG.md                     (UPDATED)
+```
+
+---
+
+# Session Log — 2026-07-13 (Round 8)
+
+## Changes
+
+### Feature: Lightbox zoom in main-column ImageViewer (instead of new tab)
+- **`dashboard/src/components/widgets/ImageViewer.vue`** — Replaced `window.open(imgUrl, '_blank')` with `lightboxSrc` ref + in-page dialog overlay (fullscreen dark backdrop, click-to-dismiss, `@click.stop` on image). Matches AssetPanel lightbox UX. Added `<style scoped>` block with `.dialog-overlay` CSS.
+
+### Feature: Cap widget output heights in main columns
+- **`ImageViewer.vue`** — Image `<img>` now capped at `max-height: min(1024px, 80vh)` with `width: auto; height: auto` to preserve aspect ratio.
+- **`MetricsCard.vue`** — `<pre>` now capped at `max-height: 40vh; overflow-y: auto` (was unbounded).
+- **`TextDisplay.vue`** — Output text capped at `max-height: 30vh` (up from hardcoded `12rem`).
+
+## Files Changed
+```
+dashboard/src/components/widgets/
+├── ImageViewer.vue               (MODIFIED: lightbox overlay, max-height cap)
+├── MetricsCard.vue               (MODIFIED: max-height 40vh)
+└── TextDisplay.vue               (MODIFIED: max-height 12rem→30vh)
+CHANGELOG.md                      (UPDATED)
+```
+
+---
+
+# Session Log — 2026-07-13 (Round 9)
+
+## Changes
+
+### Fix: Image center alignment + native download in ImageViewer
+- **`ImageViewer.vue`** — `<img>` now has `margin: 0 auto` for horizontal centering. `downloadImage()` replaced `window.open(url, '_blank')` with `<a>`-trick for native file download (no new tab).
+
+### Feature: AssetPanel image hover overlay (zoom + download) + lightbox download
+- **`AssetPanel.vue`** — Added `downloadAsset()` helper (works for both `AssetRecord` and lightbox objects). Image thumbnails now have a hover overlay with zoom + download buttons (matching ImageViewer style). Lightbox dialog wraps image in a relative container with a download button in the bottom-right corner.
+
+## Files Changed
+```
+dashboard/src/components/
+├── AssetPanel.vue               (MODIFIED: downloadAsset fn, hover overlay, lightbox download button)
+└── widgets/
+    └── ImageViewer.vue           (MODIFIED: margin:0 auto, native download)
+CHANGELOG.md                      (UPDATED)
+```

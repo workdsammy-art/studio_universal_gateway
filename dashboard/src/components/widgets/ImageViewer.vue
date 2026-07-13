@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+
 defineProps<{ widget: any; isInput: boolean }>()
+const lightboxSrc = ref<string | null>(null)
 
 function imgUrl(w: any): string {
   const f = w.data || ''
@@ -8,11 +11,16 @@ function imgUrl(w: any): string {
 }
 
 function openImage(w: any) {
-  window.open(imgUrl(w).replace('&type=output', ''), '_blank')
+  lightboxSrc.value = imgUrl(w)
 }
 
 function downloadImage(w: any) {
-  window.open(imgUrl(w) + '&download=1', '_blank')
+  const a = document.createElement('a')
+  a.href = imgUrl(w) + '&download=1'
+  a.download = w.data || w.name || 'image'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
 }
 </script>
 
@@ -21,7 +29,7 @@ function downloadImage(w: any) {
     <div v-if="widget.data" class="relative">
       <img
         :src="imgUrl(widget)"
-        style="max-width: 100%; height: auto; border-radius: var(--radius-sm); display: block;"
+        style="max-width: 100%; max-height: min(1024px, 80vh); width: auto; height: auto; border-radius: var(--radius-sm); display: block; margin: 0 auto;"
         :alt="widget.name"
       />
       <div class="absolute inset-0 flex items-center justify-center gap-3 transition-opacity opacity-0 group-hover:opacity-100" style="background: rgba(0,0,0,0.6);">
@@ -35,4 +43,28 @@ function downloadImage(w: any) {
     </div>
     <div v-else class="font-mono text-xs italic text-center p-[12px]" style="color: var(--text-secondary); opacity: 0.4;">no image</div>
   </div>
+
+  <div v-if="lightboxSrc" class="dialog-overlay" @click="lightboxSrc = null">
+    <img :src="lightboxSrc" alt="" @click.stop />
+  </div>
 </template>
+
+<style scoped>
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.dialog-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 4px;
+  cursor: default;
+}
+</style>

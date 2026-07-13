@@ -4,12 +4,14 @@ import logo from '../assets/logo.svg'
 
 const { state } = useGatewayStore()
 
-defineProps<{ isDark: boolean }>()
+defineProps<{ isDark: boolean; batchCount: number; showPanel: boolean }>()
 const emit = defineEmits<{
-  run: []
+  run: [count: number]
   cancel: []
   resync: []
   toggleTheme: []
+  togglePanel: []
+  'update:batchCount': [val: number]
 }>()
 
 function pct(): number {
@@ -22,13 +24,23 @@ function pct(): number {
   <header class="flex items-center gap-3 px-6 shrink-0" style="height: 56px; border-bottom: 1px solid var(--surface-border); background: var(--surface-ground);">
     <img :src="logo" alt="Studio Gateway" style="height: 20px; width: 20px;" />
 
-    <button
-      v-if="!state.isRunning"
-      class="btn btn-primary btn-sm"
-      style="min-width: 120px;"
-      :disabled="!state.data"
-      @click="emit('run')"
-    >Queue Prompt</button>
+    <template v-if="!state.isRunning">
+      <button
+        class="btn btn-primary btn-sm"
+        style="min-width: 120px;"
+        :disabled="!state.data"
+        @click="emit('run', batchCount)"
+      >Queue Prompt</button>
+      <input
+        type="number"
+        min="1"
+        max="100"
+        class="batch-count"
+        :value="batchCount"
+        @input="emit('update:batchCount', Math.max(1, parseInt(($event.target as HTMLInputElement).value) || 1))"
+        title="Batch count"
+      />
+    </template>
 
     <template v-if="state.isRunning">
       <button class="btn btn-danger-outline btn-sm" @click="emit('cancel')">
@@ -59,6 +71,9 @@ function pct(): number {
         Re-Sync
       </button>
       <span class="font-mono text-2xs" style="color: var(--text-secondary); opacity: 0.4;">v0.1.0</span>
+      <button class="btn btn-outline btn-icon btn-sm" :class="{ 'btn-active': showPanel }" @click="emit('togglePanel')" title="Output History">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      </button>
       <button class="btn btn-outline btn-icon btn-sm" @click="emit('toggleTheme')">
         <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         <svg v-else xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -66,3 +81,31 @@ function pct(): number {
     </div>
   </header>
 </template>
+
+<style scoped>
+.batch-count {
+  width: 44px;
+  height: 28px;
+  text-align: center;
+  font-family: monospace;
+  font-size: 12px;
+  border-radius: var(--radius-sm, 4px);
+  border: 1px solid var(--border-color, #555);
+  background: var(--surface-card, #1a1a1a);
+  color: var(--text-color, #eee);
+  outline: none;
+  -moz-appearance: textfield;
+}
+.batch-count::-webkit-inner-spin-button,
+.batch-count::-webkit-outer-spin-button {
+  opacity: 1;
+}
+.batch-count:focus {
+  border-color: var(--accent-color, #FF3F00);
+}
+.btn-active {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
+}
+</style>

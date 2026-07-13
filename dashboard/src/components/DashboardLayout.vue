@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import ColumnPanel from './ColumnPanel.vue'
-import PastGenerations from './PastGenerations.vue'
 
-const props = defineProps<{ data: any; pastGenerations: any[] }>()
-const emit = defineEmits<{ clear: [] }>()
+const props = defineProps<{ data: any }>()
 
 type Position = 'left' | 'middle' | 'right'
 
@@ -122,7 +120,6 @@ onUnmounted(() => {
         :input-widgets="byPosition.right.inputs"
         :output-widgets="byPosition.right.outputs"
       />
-      <PastGenerations :generations="pastGenerations" @clear="emit('clear')" />
     </aside>
   </div>
 </template>
